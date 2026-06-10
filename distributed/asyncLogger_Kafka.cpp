@@ -94,7 +94,7 @@ public:
 
     { // critical section
       lock_guard<mutex> lock(mtx);
-      logs.push(msg);
+      logs.push(std::move(msg));
     }
     cv.notify_one();
   }
@@ -114,7 +114,7 @@ public:
         if (logs.empty() && stop)
           break;
 
-        msg = logs.front();
+        msg = std::move(logs.front());
         logs.pop();
       }
 
