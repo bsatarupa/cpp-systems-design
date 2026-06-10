@@ -1,0 +1,15 @@
+*.out
+*.exe
+*.o
+*.dSYM
+*.log
+
+huge.txt
+sorted_huge.txt
+input.txt
+output.txt
+
+a.out
+app.log
+wal.log
+wal_recovery.log
