@@ -60,6 +60,7 @@ int main(int argc, char *argv[]) {
       cout << buffer[i];
       // if (buffer[i] == '\n') line_count++;
     }
+    // Alternate of char-by-char writing: cout.write(buffer, bytes_read);
   }
 
   close(fd);

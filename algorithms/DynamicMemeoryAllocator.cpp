@@ -67,7 +67,7 @@ public:
     // 2. Merge with previous block
     if (curr != available.begin()) {
 
-      auto prev_iter = available.begin();
+      auto prev_iter = prev(curr);
       if (prev_iter->first + prev_iter->second == curr->first) {
 
         prev_iter->second += curr->second;
