@@ -1,3 +1,12 @@
+/*
+Design a A Delayed Task Scheduler that executes a task only once after a
+specified delay.
+A delayed task scheduler executes one-time tasks after a specified delay.
+It typically uses a min-heap ordered by execution time and worker threads
+waiting on a condition variable. My implementation is a delayed task scheduler
+because tasks are executed once and removed. To make it a full task scheduler,
+I would add periodic tasks and task cancellation support.
+*/
 #include <chrono>
 #include <condition_variable>
 #include <functional>
@@ -60,8 +69,14 @@ public:
         // 3. ***Wait until execution time
         auto execution_time = pq.top().executeAt;
         if (chrono::steady_clock::now() < execution_time) {
-          cv.wait_until(lock, execution_time);
-          continue; //****VVIMP, to go back to function top
+          cv.wait_until(lock, execution_time, [&]() {
+            return stop == true; // in case of spurious wakeup before timeout,
+                                 // go back to waiting unless stop == true
+          });
+
+          continue; //****VVIMP, to go back to function top, to recheck
+                    // priority_queue if a new task with earlier execution time
+                    // has been scheduled
         }
 
         // get task ready to get executed

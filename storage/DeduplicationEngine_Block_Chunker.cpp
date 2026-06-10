@@ -1,6 +1,14 @@
-/*
- Design an In-Memory Data Reduction Block Chunker similar to systems used in
-Cohesity, Rubrik, or Data Domain.
+/* Content Deduplication Engine:
+ Design a deduplication engine that breaks files into chunks and avoids storing
+ duplicate chunks. Fingerprints should uniquely identify chunks. Storage space
+should be minimized. [Design an In-Memory Data Reduction Block Chunker similar
+to systems used in Cohesity, Rubrik, or Data Domain.]
+
+Implemented a Content Deduplication Engine that splits files into fixed-size
+chunks, computes fingerprints, and stores only unique chunks using a
+deduplication index wit h reference counting. Files are reconstructed by
+following the stored fingerprint sequence, while duplicate chunks share the same
+physical storage to minimize space.
 
 Requirements:
 Accept a file (byte stream/string) as input.

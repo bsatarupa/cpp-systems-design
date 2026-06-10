@@ -1,16 +1,20 @@
-/* SnapshotManager = RestoreEngine
- Design a snapshot manager that allows creating and restoring snapshots of
-volumes or files. Multiple snapshots may coexist. Snapshots should be
-retrievable by ID. SnapshotManager
-      |
-      +-----------------------------+
-      |                             |
-      v                             v
- Block Store                 Snapshot Table
-(id,data,refCount)      version -> block_ids
-            ^
-            |
-     Current File
+/* Snapshot Manager = Restore Engine
+ Design a Restore Engine capable of reconstructing files from stored chunks.
+ Users should be able to restore a specific snapshot or version.
+ Restore progress should be trackable. (----Only this part needs to be added)
+
+               RestoreEngine
+                    |
+         ------------------------
+         |                      |
+     BlockStore            SnapshotTable
+
+Implementation details:
+RestoreEngine maintains immutable blocks using Copy-on-Write semantics.
+Snapshots store references to shared blocks instead of duplicating data.
+Restoring a version simply switches the current block list to the snapshot's
+block list while updating reference counts. Restore progress is tracked by
+counting restored blocks over the total number of blocks in the snapshot.
  */
 #include <iostream>
 #include <unordered_map>
@@ -36,7 +40,7 @@ public:
       : version(version), block_ids(blocks) {}
 };
 
-class SnapshotManager {
+class RestoreEngine {
 
   int next_block_id = 1;
   int next_version = 1;
@@ -111,6 +115,20 @@ public:
 
     // VVIMP: current file will start referencing restored blocks
     incrementRefCount(current_blocks);
+
+    //------------Progress Tracking----------------
+    int totalBlocks = current_blocks.size();
+    int restoredBlocks = 0;
+
+    for (int block_id : current_blocks) {
+      restoredBlocks++;
+      cout << "Progress : " << restoredBlocks * 100 / totalBlocks << "%\n";
+    }
+    // In this in-memory prototype, restore is essentially a metadata operation,
+    // so it completes immediately. In a production restore engine, each block
+    // would be fetched from disk or object storage, and I'd update the progress
+    // after each block is restored. Here I'm simulating that block-by-block
+    // progress while keeping the restore logic unchanged.
   }
 
   void deleteSnapshot(int version) { // delete snapshot and free blocks if
@@ -160,7 +178,7 @@ public:
     }
   }
 
-  ~SnapshotManager() {
+  ~RestoreEngine() {
 
     for (auto &[id, block] : blockStore)
       delete block;
@@ -172,7 +190,7 @@ public:
 
 int main() {
 
-  SnapshotManager sm;
+  RestoreEngine sm;
 
   sm.write("A");
   sm.write("B");
@@ -212,7 +230,7 @@ int main() {
   return 0;
 }
 
-/* Snapshot Manager :
+/* Restore Engine :
  * Implemented a Copy-on-Write (CoW) Snapshot Manager using immutable blocks and
 reference counting.
  * Snapshots share blocks instead of copying data, enabling space-efficient
@@ -224,7 +242,7 @@ when no snapshot references them.
 
 Architecture
                 +----------------+
-                | SnapshotManager |
+                | RestoreEngine |
                 +----------------+
                    |          |
                    |          |
@@ -269,6 +287,8 @@ Snapshot 1 : A B
 Snapshot 2 : A B C D
 
 Restoring Snapshot : 1
+Progress : 50%
+Progress : 100%
 
 Block Store
 Block 4 : D RefCount=1

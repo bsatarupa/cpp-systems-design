@@ -29,6 +29,9 @@ public:
 
     unique_lock<shared_mutex> writelock(rwLock);
     cache.splice(cache.begin(), cache, found->second);
+    // TC: O(1); a doubly-linked-list only needs to update next and prev
+    // pointers for moving elements to any random position. This cache is DLL in
+    // nature.
     return val;
   }
 

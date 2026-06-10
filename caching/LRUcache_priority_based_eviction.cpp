@@ -43,7 +43,7 @@ public:
   }
 
   void put(int key, int value, int priority) {
-    auto found = mm.end();
+    auto found = mm.find(key);
     if (found != mm.end()) { // key found
       auto node_iter = found->second;
       priority_set.erase(node_iter);

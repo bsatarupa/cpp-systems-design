@@ -1,7 +1,20 @@
 /*
+Design a thread pool that accepts tasks and executes them using a
+fixed number of worker threads. Tasks should be queued when all
+workers are busy. The pool should support graceful shutdown.
+
 Thread pools improve throughput and reduce thread creation overhead by
 reusing a fixed set of worker threads to execute queued tasks.
-*/
+
+ThreadPool
+ |
+ |---- constructor
+ |       |
+ |       +--- hidden lambda
+ |
+ |---- submit()
+ |
+ |---- destructor()*/
 #include <chrono>
 #include <condition_variable>
 #include <iostream>
